@@ -576,6 +576,8 @@ TYPEINFO(/obj/item/clothing/glasses/spectro)
 	icon_state = "spectro"
 	item_state = "glasses"
 	desc = "Goggles with an integrated minature Raman spectroscope for easy qualitative and quantitative analysis of chemical samples."
+	var/scan_upgrade = 0
+	var/ABV_scan = 0
 	color_r = 1 // pink tint?
 	color_g = 0.8
 	color_b = 0.9
@@ -592,11 +594,42 @@ TYPEINFO(/obj/item/clothing/glasses/spectro)
 		. = ..()
 		REMOVE_ATOM_PROPERTY(user, PROP_MOB_SPECTRO, src)
 
+	attackby(obj/item/W, mob/user)
+		if (istype(W, /obj/item/device/analyzer/ABV_upgrade))
+			if (src.scan_upgrade)
+				boutput(user, SPAN_ALERT("[src] already has an ABV upgrade!"))
+				return
+			else
+				src.scan_upgrade = 1
+				src.ABV_scan = 1
+				var/mob/living/carbon/human/human_user = user
+				if (istype(human_user) && human_user.glasses == src)
+					APPLY_ATOM_PROPERTY(user,PROP_MOB_EXAMINE_HEALTH,src) //mintodo PROP_MOB_EXAMINE_HEALTH? really? You're better than this
+				src.icon_state = "spectro-upgraded" //MINTODO SPRITE THIS
+				boutput(user, SPAN_NOTICE("ABV calculator upgrade installed."))
+				playsound(src.loc , 'sound/items/Deconstruct.ogg', 80, 0)
+				user.u_equip(W)
+				qdel(W)
+				return
+		else
+			return ..()
+
+/obj/item/clothing/glasses/spectro/upgraded
+	icon_state = "spectro-upgraded"
+	scan_upgrade = 1
+	ABV_scan = 1
+
 /obj/item/clothing/glasses/spectro/monocle //used for bartender job reward
 	name = "spectroscopic monocle"
 	icon_state = "spectro_monocle"
 	item_state = "spectro_monocle"
 	desc = "Such a dapper eyepiece! And a practical one at that."
+
+/obj/item/clothing/glasses/spectro/monocle/upgraded
+	icon_state = "spectro_monocle-upgraded"
+	item_state = "spectro_monocle-upgraded"
+	scan_upgrade = 1
+	ABV_scan = 1
 
 // testing thing for static overlays
 /obj/item/clothing/glasses/staticgoggles
