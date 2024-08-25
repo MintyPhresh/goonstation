@@ -225,67 +225,67 @@
 		else if(message)
 			return
 
-	emote(var/act, var/voluntary) //souldorf emotes!
-		if(!src.free)
-			return
-		if(src.emoting)
-			return
-		..()
-		var/icon/soulcache
-		var/icon/blendic
-		switch (lowertext(act))
-			if("flip")
-				if(invisibility)
-					if(src.emote_check(voluntary, 100, 1, 0))
-						src.visible_message("<span><b>[src.name]</b> spins in place!</span>")
-						if (prob(50))
-							animate_spin(src, "R", 1, 0)
-						else
-							animate_spin(src, "L", 1, 0)
-				else
-					if(src.emote_check(voluntary, 100, 1, 0))
+	// emote(var/act, var/voluntary) //souldorf emotes!
+	// 	if(!src.free)
+	// 		return
+	// 	if(src.emoting)
+	// 		return
+	// 	..()
+	// 	var/icon/soulcache
+	// 	var/icon/blendic
+	// 	switch (lowertext(act))
+	// 		if("flip")
+	// 			if(invisibility)
+	// 				if(src.emote_check(voluntary, 100, 1, 0))
+	// 					src.visible_message("<span><b>[src.name]</b> spins in place!</span>")
+	// 					if (prob(50))
+	// 						animate_spin(src, "R", 1, 0)
+	// 					else
+	// 						animate_spin(src, "L", 1, 0)
+	// 			else
+	// 				if(src.emote_check(voluntary, 100, 1, 0))
 
-						src.visible_message("<span><b>[src.name]</b> shakes off the ectoplasm!</span>")
-						var/wiggle = 6
-						while(wiggle > 0)
-							wiggle--
-							src.pixel_x = rand(-3,3)
-							src.pixel_y = rand(-3,3)
-							sleep(0.1 SECONDS)
-						src.pixel_x = 0
-						src.pixel_y = 0
-						APPLY_ATOM_PROPERTY(src, PROP_MOB_INVISIBILITY, src, INVIS_GHOST)
-						src.ClearAllOverlays()
-						var/obj/item/reagent_containers/food/snacks/ectoplasm/e = new /obj/item/reagent_containers/food/snacks/ectoplasm
-						e.set_loc(get_turf(src))
-			if("fart")
-				src.visible_message("<span><b>[src.name]</b> flies in a figure 8!</span>")
-				src.emoting = 1
-				soulcache = src.icon
-				if(!src.invisibility)
-					src.visible_message(SPAN_ALERT("<b>The ectoplasm falls off! Oh no!</b>"))
-					APPLY_ATOM_PROPERTY(src, PROP_MOB_INVISIBILITY, src, INVIS_GHOST)
-					src.ClearAllOverlays()
-					var/obj/item/reagent_containers/food/snacks/ectoplasm/e = new /obj/item/reagent_containers/food/snacks/ectoplasm
-					e.set_loc(get_turf(src))
-				blendic = new /icon('icons/obj/zoldorf.dmi',"figure8")
-				if(src.soulcolor)
-					blendic.Blend("[soulcolor]",ICON_MULTIPLY)
-				src.icon = blendic
-				sleep(22.5)
-				src.icon = soulcache
-				src.emoting = 0
-			if("scream")
-				if(src.emote_check(voluntary, 100, 1, 0))
-					src.visible_message("<span><b>[src.name]</b> vibrates mid-air...</span>")
-					var/wiggle = 6
-					while(wiggle > 0)
-						wiggle--
-						src.pixel_x = rand(-2,2)
-						src.pixel_y = rand(-2,2)
-						sleep(0.1 SECONDS)
-					src.pixel_x = 0
-					src.pixel_y = 0
+	// 					src.visible_message("<span><b>[src.name]</b> shakes off the ectoplasm!</span>")
+	// 					var/wiggle = 6
+	// 					while(wiggle > 0)
+	// 						wiggle--
+	// 						src.pixel_x = rand(-3,3)
+	// 						src.pixel_y = rand(-3,3)
+	// 						sleep(0.1 SECONDS)
+	// 					src.pixel_x = 0
+	// 					src.pixel_y = 0
+	// 					APPLY_ATOM_PROPERTY(src, PROP_MOB_INVISIBILITY, src, INVIS_GHOST)
+	// 					src.ClearAllOverlays()
+	// 					var/obj/item/reagent_containers/food/snacks/ectoplasm/e = new /obj/item/reagent_containers/food/snacks/ectoplasm
+	// 					e.set_loc(get_turf(src))
+	// 		if("fart")
+	// 			src.visible_message("<span><b>[src.name]</b> flies in a figure 8!</span>")
+	// 			src.emoting = 1
+	// 			soulcache = src.icon
+	// 			if(!src.invisibility)
+	// 				src.visible_message(SPAN_ALERT("<b>The ectoplasm falls off! Oh no!</b>"))
+	// 				APPLY_ATOM_PROPERTY(src, PROP_MOB_INVISIBILITY, src, INVIS_GHOST)
+	// 				src.ClearAllOverlays()
+	// 				var/obj/item/reagent_containers/food/snacks/ectoplasm/e = new /obj/item/reagent_containers/food/snacks/ectoplasm
+	// 				e.set_loc(get_turf(src))
+	// 			blendic = new /icon('icons/obj/zoldorf.dmi',"figure8")
+	// 			if(src.soulcolor)
+	// 				blendic.Blend("[soulcolor]",ICON_MULTIPLY)
+	// 			src.icon = blendic
+	// 			sleep(22.5)
+	// 			src.icon = soulcache
+	// 			src.emoting = 0
+	// 		if("scream")
+	// 			if(src.emote_check(voluntary, 100, 1, 0))
+	// 				src.visible_message("<span><b>[src.name]</b> vibrates mid-air...</span>")
+	// 				var/wiggle = 6
+	// 				while(wiggle > 0)
+	// 					wiggle--
+	// 					src.pixel_x = rand(-2,2)
+	// 					src.pixel_y = rand(-2,2)
+	// 					sleep(0.1 SECONDS)
+	// 				src.pixel_x = 0
+	// 				src.pixel_y = 0
 
 	death(gibbed)
 		. = ..()

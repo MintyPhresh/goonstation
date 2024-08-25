@@ -272,10 +272,10 @@
 	say_main_radio(msg as text)
 		src.mainframe.say_main_radio(msg)
 
-	emote(var/act, var/voluntary = 0)
-		..()
-		if (mainframe)
-			mainframe.emote(act, voluntary)
+	// emote(var/act, var/voluntary = 0)
+	// 	..()
+	// 	if (mainframe)
+	// 		mainframe.emote(act, voluntary)
 
 	hearing_check(var/consciousness_check = 0) //can't hear SHIT - everything is passed from the AI mob through send_message and whatever
 		return 0

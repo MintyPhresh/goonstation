@@ -112,25 +112,25 @@
 			boutput(src, "You are currently muted and may not speak.")
 			return
 
-	emote(var/act, var/voluntary)
-		..()
-		var/message
-		switch (lowertext(act))
-			if("flip")
-				if(src.emote_check(voluntary, 100, 1, 0))
-					message = "flips ominously!"
-					if (prob(50))
-						animate_spin(src, "R", 1, 0)
-					else
-						animate_spin(src, "L", 1, 0)
-			if("fart")
-				if(src.emote_check(voluntary, 100, 1, 0))
-					message = "emits a chilling wind..."
-			if("scream")
-				if(src.emote_check(voluntary, 100, 1, 0))
-					message = "produces a low hum..."
-		if(message)
-			src.visible_message("<span><b>[src.name]</b> [message]</span>")
+	// emote(var/act, var/voluntary)
+	// 	..()
+	// 	var/message
+	// 	switch (lowertext(act))
+	// 		if("flip")
+	// 			if(src.emote_check(voluntary, 100, 1, 0))
+	// 				message = "flips ominously!"
+	// 				if (prob(50))
+	// 					animate_spin(src, "R", 1, 0)
+	// 				else
+	// 					animate_spin(src, "L", 1, 0)
+	// 		if("fart")
+	// 			if(src.emote_check(voluntary, 100, 1, 0))
+	// 				message = "emits a chilling wind..."
+	// 		if("scream")
+	// 			if(src.emote_check(voluntary, 100, 1, 0))
+	// 				message = "produces a low hum..."
+	// 	if(message)
+	// 		src.visible_message("<span><b>[src.name]</b> [message]</span>")
 
 	death(gibbed)
 		. = ..()

@@ -76,16 +76,16 @@
 
 		. = src.say_dead(message, 1)
 
-	emote(var/act, var/voluntary = 0, var/emoteTarget = null)
-		if(isghost)
-			if (findtext(act, " ", 1, null))
-				var/t1 = findtext(act, " ", 1, null)
-				act = copytext(act, 1, t1)
-			var/txt = lowertext(act)
-			if (txt == "custom" || txt == "customh" || txt == "customv" || txt == "me" || txt == "airquote" || txt == "airquotes")
-				boutput(usr, "You may not use that emote as a Virtual Spectre.")
-				return
-		..()
+	// emote(var/act, var/voluntary = 0, var/emoteTarget = null)
+	// 	if(isghost)
+	// 		if (findtext(act, " ", 1, null))
+	// 			var/t1 = findtext(act, " ", 1, null)
+	// 			act = copytext(act, 1, t1)
+	// 		var/txt = lowertext(act)
+	// 		if (txt == "custom" || txt == "customh" || txt == "customv" || txt == "me" || txt == "airquote" || txt == "airquotes")
+	// 			boutput(usr, "You may not use that emote as a Virtual Spectre.")
+	// 			return
+	// 	..()
 
 	whisper(message as text, forced=FALSE)
 		if (isghost)

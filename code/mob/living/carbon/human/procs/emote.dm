@@ -1,5 +1,5 @@
 // emote
-
+/*
 /mob/living/carbon/human/emote(var/act, var/voluntary = 0, var/emoteTarget = null) //mbc : if voluntary is 2, it's a hotkeyed emote and that means that we can skip the findtext check. I am sorry, cleanup later
 	set waitfor = FALSE
 	..()
@@ -2456,4 +2456,4 @@
 		if("obj")
 			for(var/obj/O in view(range, get_turf(src)))
 				targets += O
-	return targets
+	return targets*/
