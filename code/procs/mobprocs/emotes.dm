@@ -5,6 +5,8 @@
 
 ///parent emote
 ABSTRACT_TYPE(/datum/emotedata)
+datum/emotedata/proc/make_emote(var/emoter, var/atom/target)
+	return
 /datum/emotedata
 	/// word you use to activate the emote, e.g. *fart (or similar). As list, to support multiple aliases
 	var/list/phrase
@@ -30,14 +32,12 @@ ABSTRACT_TYPE(/datum/emotedata)
 	var/em_muzzled_fail_chattext = "<B>%src%</B> tries to make a noise." // generic muzzled failtext
 	var/em_muzzled_fail_maptext = "<I>tries to make a noise</I>"
 
-	New(var/emoter, var/atom/target)
-		..()
-		return
+
 
 	nod
 		phrase = list("nod")
 
-		New(var/emoter, var/atom/target)
+		make_emote(var/emoter, var/atom/target, var/em_chattext, var/em_maptext)
 			em_chattext = "<B>[emoter]</B> nods."
 			em_maptext = "<I>nods</I>"
 			. = ..()
@@ -165,23 +165,21 @@ ABSTRACT_TYPE(/datum/emotedata/info)
 		em_data = get_singleton(em_data)
 		if (act in em_data.phrase)
 			selected_emote = em_data
+			selected_emote.make_emote(emoter = src, target = emoteTarget, em_chattext, em_maptext)
 			break
-
-	if (selected_emote)
-		selected_emote.New(emoter = src, target = emoteTarget)
-	else if (voluntary)
+	if (!selected_emote && voluntary)
 		src.show_text("Invalid Emote: [act]")
 
 	//////////////////////////////////////////////////////
 	//// FOLLOWING CODE IS STOLEN FROM OLD EMOTE CODE ////
 	//////////////////////////////////////////////////////
 
-	 if (selected_emote.em_maptext && !ON_COOLDOWN(src, "emote maptext", 0.5 SECONDS))
+	 if (em_maptext && !ON_COOLDOWN(src, "emote maptext", 0.5 SECONDS))
 		var/image/chat_maptext/chat_text = null
 		SPAWN(0) //blind stab at a life() hang - REMOVE LATER
 			var/mob/living/L = src
 			if (speechpopups && src.chat_text && L)
-				chat_text = make_chat_maptext(src, selected_emote.em_maptext, "color: #C2BEBE;" + L.speechpopupstyle, alpha = 140)
+				chat_text = make_chat_maptext(src, em_maptext, "color: #C2BEBE;" + L.speechpopupstyle, alpha = 140)
 				if(chat_text)
 					if(selected_emote.mode == VISIBLE)
 						chat_text.plane = PLANE_NOSHADOW_ABOVE
@@ -191,19 +189,19 @@ ABSTRACT_TYPE(/datum/emotedata/info)
 						if(I != chat_text)
 							I.bump_up(chat_text.measured_height)
 
-			if (selected_emote.em_chattext)
-				logTheThing(LOG_SAY, src, "EMOTE: [selected_emote.em_chattext]")
+			if (em_chattext)
+				logTheThing(LOG_SAY, src, "EMOTE: [em_chattext]")
 				act = lowertext(act)
 				if (selected_emote.mode == VISIBLE)
 					for (var/mob/O in viewers(src, null))
-						O.show_message(SPAN_EMOTE("[selected_emote.em_chattext]"), selected_emote.mode, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
+						O.show_message(SPAN_EMOTE("[em_chattext]"), selected_emote.mode, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
 				else if (selected_emote.mode == AUDIBLE)
 					for (var/mob/O in hearers(src, null))
-						O.show_message(SPAN_EMOTE("[selected_emote.em_chattext]"), selected_emote.mode, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
+						O.show_message(SPAN_EMOTE("[em_chattext]"), selected_emote.mode, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
 				else if (!isturf(src.loc))
 					var/atom/A = src.loc
 					for (var/mob/O in A.contents)
-						O.show_message(SPAN_EMOTE("[selected_emote.em_chattext]"), selected_emote.mode, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
+						O.show_message(SPAN_EMOTE("[em_chattext]"), selected_emote.mode, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
 
 
 	else //The only difference between this and what comes before is that the "O.show_message()" has an extra bit with assoc_maptext = chat_text.

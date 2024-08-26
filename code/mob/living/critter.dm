@@ -1179,45 +1179,45 @@ ADMIN_INTERACT_PROCS(/mob/living/critter, proc/modify_health, proc/admincmd_atta
 // 					else
 // 						message = "<b>[src]</B> does a flip!"
 // 						animate_spin(src, pick("L", "R"), 1, 0)
-	if (maptext_out && !ON_COOLDOWN(src, "emote maptext", 0.5 SECONDS))
-		var/image/chat_maptext/chat_text = null
-		SPAWN(0) //blind stab at a life() hang - REMOVE LATER
-			if (speechpopups && src.chat_text)
-				chat_text = make_chat_maptext(src, maptext_out, "color: #C2BEBE;" + src.speechpopupstyle, alpha = 140)
-				if(chat_text)
-					if(m_type & 1)
-						chat_text.plane = PLANE_NOSHADOW_ABOVE
-						chat_text.layer = 420
-					chat_text.measure(src.client)
-					for(var/image/chat_maptext/I in src.chat_text.lines)
-						if(I != chat_text)
-							I.bump_up(chat_text.measured_height)
-			if (message)
-				logTheThing(LOG_SAY, src, "EMOTE: [message]")
-				act = lowertext(act)
-				if (m_type & 1)
-					for (var/mob/O in viewers(src, null))
-						O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
-				else if (m_type & 2)
-					for (var/mob/O in hearers(src, null))
-						O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
-				else if (!isturf(src.loc))
-					var/atom/A = src.loc
-					for (var/mob/O in A.contents)
-						O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
-	else
-		if (message)
-			logTheThing(LOG_SAY, src, "EMOTE: [message]")
-			if (m_type & 1)
-				for (var/mob/O in viewers(src, null))
-					O.show_message(SPAN_EMOTE("[message]"), m_type)
-			else if (m_type & 2)
-				for (var/mob/O in hearers(src, null))
-					O.show_message(SPAN_EMOTE("[message]"), m_type)
-			else if (!isturf(src.loc))
-				var/atom/A = src.loc
-				for (var/mob/O in A.contents)
-					O.show_message(SPAN_EMOTE("[message]"), m_type)
+	// if (maptext_out && !ON_COOLDOWN(src, "emote maptext", 0.5 SECONDS))
+	// 	var/image/chat_maptext/chat_text = null
+	// 	SPAWN(0) //blind stab at a life() hang - REMOVE LATER
+	// 		if (speechpopups && src.chat_text)
+	// 			chat_text = make_chat_maptext(src, maptext_out, "color: #C2BEBE;" + src.speechpopupstyle, alpha = 140)
+	// 			if(chat_text)
+	// 				if(m_type & 1)
+	// 					chat_text.plane = PLANE_NOSHADOW_ABOVE
+	// 					chat_text.layer = 420
+	// 				chat_text.measure(src.client)
+	// 				for(var/image/chat_maptext/I in src.chat_text.lines)
+	// 					if(I != chat_text)
+	// 						I.bump_up(chat_text.measured_height)
+	// 		if (message)
+	// 			logTheThing(LOG_SAY, src, "EMOTE: [message]")
+	// 			act = lowertext(act)
+	// 			if (m_type & 1)
+	// 				for (var/mob/O in viewers(src, null))
+	// 					O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
+	// 			else if (m_type & 2)
+	// 				for (var/mob/O in hearers(src, null))
+	// 					O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
+	// 			else if (!isturf(src.loc))
+	// 				var/atom/A = src.loc
+	// 				for (var/mob/O in A.contents)
+	// 					O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]", assoc_maptext = chat_text)
+	// else
+	// 	if (message)
+	// 		logTheThing(LOG_SAY, src, "EMOTE: [message]")
+	// 		if (m_type & 1)
+	// 			for (var/mob/O in viewers(src, null))
+	// 				O.show_message(SPAN_EMOTE("[message]"), m_type)
+	// 		else if (m_type & 2)
+	// 			for (var/mob/O in hearers(src, null))
+	// 				O.show_message(SPAN_EMOTE("[message]"), m_type)
+	// 		else if (!isturf(src.loc))
+	// 			var/atom/A = src.loc
+	// 			for (var/mob/O in A.contents)
+	// 				O.show_message(SPAN_EMOTE("[message]"), m_type)
 
 
 /mob/living/critter/talk_into_equipment(var/mode, var/message, var/param)

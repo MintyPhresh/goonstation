@@ -2310,7 +2310,7 @@
 			else if (!isturf(src.loc))
 				var/atom/A = src.loc
 				for (var/mob/O in A.contents)
-					O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]")
+					O.show_message(SPAN_EMOTE("[message]"), m_type, group = "[src]_[act]_[custom]") */
 
 /mob/living/carbon/human/proc/expel_fart_gas(var/oxyplasmafart)
 	var/turf/T = get_turf(src)
@@ -2456,4 +2456,4 @@
 		if("obj")
 			for(var/obj/O in view(range, get_turf(src)))
 				targets += O
-	return targets*/
+	return targets
