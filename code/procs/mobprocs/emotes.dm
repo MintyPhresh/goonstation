@@ -1,6 +1,8 @@
 // emote
 #define VISIBLE 1
 #define AUDIBLE 2
+#define OPT_OUT 1 // Emote usable unless specifically disallowed
+#define OPT_IN  0 // Emote only usable if specifically allowed
 //#define VISIBLEAUDIBLE 3
 
 ///parent emote
