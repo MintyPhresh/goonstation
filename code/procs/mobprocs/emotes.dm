@@ -6,32 +6,36 @@
 #define OPT_IN  2 // Emote only usable if specifically allowed
 #define RESTRAINED 1
 #define MUZZLED 2
+#define CUSTOM  3
 #define CONSOLE 1
 #define RETICLE 2
 
 
 ///parent emote
 ABSTRACT_TYPE(/datum/emotedata)
+
+/datum/emotedata/proc/custom_squelch_condition(var/mob/emoter, var/target, var/em_chattext, var/em_maptext)
+	//boutput(emoter, "Test Output 1")
+
 /datum/emotedata/proc/make_emote(var/mob/emoter, var/target) //Default behavior for emotes
-
-	em_restrained_fail_chattext ||= "<B>[emoter]</B> struggles to move."
-	em_restrained_fail_maptext ||= "<I>struggles to move</I>"
-
-	em_muzzled_fail_chattext ||= "<B>[emoter]</B> tries to make a noise."
-	em_muzzled_fail_maptext ||= "<I>tries to make a noise</I>"
-
-	switch(use_is_restricted_if)
+	switch(emote_squelched_if)
 		if(RESTRAINED)
+			em_fail_chattext ||= "<B>[emoter]</B> struggles to move."
+			em_fail_maptext ||= "<I>struggles to move</I>"
 			if(emoter.restrained()) // switch outputs to restrained outputs if you're restrained & the emote cares about that
-				em_chattext = em_restrained_fail_chattext
-				em_maptext = em_restrained_fail_maptext
+				em_chattext = em_fail_chattext
+				em_maptext = em_fail_maptext
 		if(MUZZLED)
+			em_fail_chattext ||= "<B>[emoter]</B> tries to make a noise."
+			em_fail_maptext ||= "<I>tries to make a noise</I>"
 			if(emoter.wear_mask && emoter.wear_mask.is_muzzle) // switch outputs to muzzled outputs if you're muzzled & the emote cares about that
-				em_chattext = em_muzzled_fail_chattext
-				em_maptext = em_muzzled_fail_maptext
+				em_chattext = em_fail_chattext
+				em_maptext = em_fail_maptext
+		if(CUSTOM)
+			src.custom_squelch_condition(emoter, target, em_chattext, em_maptext)
 	return
 /datum/emotedata
-	// By default, the name of the emote datum is the activation phrase, e.g. *fart (or similar). (this happens in New())
+	// By default, the name of the emote datum is the activation phrase, e.g. *fart (or similar).
 	/// This list is for if the emote has alternate phrases that can activate it.
 	var/list/phrases
 	/// Defines if an emote is visible, audible, or both (both functionality ETA never?).
@@ -44,23 +48,38 @@ ABSTRACT_TYPE(/datum/emotedata)
 	/// UNIMPLEMENTED You must wait this long before performing another emote.
 	var/cooldown = 0 SECONDS
 	/// UNIMPLEMENTED Is the emote opt-out (available by default) or opt-in (must be enabled for the specific mob)?
-	var/em_opt
-		// Use opt-in for emotes exclusive to specific mobs or situations, e.g. *birdwell, which seems to be silicon exclusive.
+	var/em_opt = OPT_OUT
+		// Use OPT_IN for emotes exclusive to specific mobs or situations, like the silicon-exclusive *birdwell.
 
-	/// Does something different if it's set to RESTRAINED or MUZZLED while you satisfy those conditions.
-	var/use_is_restricted_if
+	/// "Squelched" emotes do something different if certain conditions are met (such as being cuffed) but aren't outright blocked.
+	var/emote_squelched_if
 
-	var/em_restrained_fail_chattext //generic restrained/muzzled failtexts
-	var/em_restrained_fail_maptext
-	var/em_muzzled_fail_chattext
-	var/em_muzzled_fail_maptext
+	var/em_fail_chattext //generic restrained/muzzled failtexts
+	var/em_fail_maptext
 
 ABSTRACT_TYPE(/datum/emotedata/basic)
 /datum/emotedata/basic
+	angryflap
+		phrases = list("aflap")
+		make_emote(var/mob/emoter, var/target)
+			em_chattext = "<b>[emoter]</b> flaps [his_or_her(emoter)] arms ANGRILY!"
+			em_maptext = "<I>flaps [his_or_her(emoter)] arms ANGRILY</I>"
+			em_fail_chattext = "<b>[emoter]</b> writhes angrily!"
+			em_fail_maptext ="<I>writhes angrily!</I>"
+			if (ishuman(emoter))
+				var/mob/living/carbon/human/H = emoter
+				if (H.sound_list_flap && length(H.sound_list_flap))
+					playsound(H.loc, pick(H.sound_list_flap), 80, 0, 0, H.get_age_pitch(), channel=VOLUME_CHANNEL_EMOTE)
+			. = ..()
+		emote_squelched_if = RESTRAINED
 	blush
 		make_emote(var/mob/emoter, var/target)
 			em_chattext = "<b>[emoter]</b> blushes."
 			em_maptext = "<I>blushes</I>"
+			. = ..()
+		emote_squelched_if = CUSTOM
+		custom_squelch_condition(var/mob/emoter, var/target, var/em_chattext, var/em_maptext)
+			boutput(emoter, "Test Oputput")
 			. = ..()
 	eyebrow
 		phrases = list("raiseeyebrow")
@@ -68,6 +87,18 @@ ABSTRACT_TYPE(/datum/emotedata/basic)
 			em_chattext = "<b>[emoter]</b> raises an eyebrow."
 			em_maptext = "<I>raises an eyebrow</I>"
 			. = ..()
+	flap
+		make_emote(var/mob/emoter, var/target)
+			em_chattext = "<b>[emoter]</b> flaps [his_or_her(emoter)] arms!"
+			em_maptext = "<I>flaps [his_or_her(emoter)] arms</I>"
+			em_fail_chattext = "<b>[emoter]</b> writhes!"
+			em_fail_maptext ="<I>writhes!</I>"
+			if (ishuman(emoter))
+				var/mob/living/carbon/human/H = emoter
+				if (H.sound_list_flap && length(H.sound_list_flap))
+					playsound(H.loc, pick(H.sound_list_flap), 80, 0, 0, H.get_age_pitch(), channel=VOLUME_CHANNEL_EMOTE)
+			. = ..()
+		emote_squelched_if = RESTRAINED
 	flinch
 		make_emote(var/mob/emoter, var/target)
 			em_chattext = "<b>[emoter]</b> flinches."
@@ -75,19 +106,19 @@ ABSTRACT_TYPE(/datum/emotedata/basic)
 			. = ..()
 	flipout
 		make_emote(var/mob/emoter, var/target)
-			em_chattext = "<b>[emoter]</b> shakes [his_or_her(emoter)] head."
-			em_maptext = "<I>shakes [his_or_her(emoter)] head</I>"
+			em_chattext = "<b>[emoter]</b> flips the fuck out!."
+			em_maptext = "<I>flips the fuck out!</I>"
 			. = ..()
-	handpuppet //contains some commented-out code because this emote needs improvement, but it should be atomized
-		// use_is_restricted_if = RESTRAINED
+	handpuppet //contains some commented-out code because this emote needs improvement
+		// emote_squelched_if = RESTRAINED
 		make_emote(var/mob/emoter, var/target)
 			em_chattext = "<b>[emoter]</b> throws [his_or_her(emoter)] voice, badly, while flapping [his_or_her(emoter)] thumb and index finger like some sort of lips.[prob(10) ? " Admittedly, it is a pretty good impression of the [pick("captain", "head of personnel", "clown", "research director", "chief engineer", "head of security", "medical director", "AI", "chaplain", "detective")]." : null]"
 			// em_maptext = "<I>talks funny while handpuppeting</I>"
-			// em_restrained_fail_chattext = "<b>[emoter]</b> throws [his_or_her(emoter)] voice, badly, while moving [his_or_her(emoter)] fingers in a way you can't really understand.
-			// em_restrained_fail_maptext ="<I>talks funny while trying to move [his_or_her(emoter)] arm</I>"
+			// em_fail_chattext = "<b>[emoter]</b> throws [his_or_her(emoter)] voice, badly, while moving [his_or_her(emoter)] fingers in a way you can't really understand.
+			// em_fail_maptext ="<I>talks funny while trying to move [his_or_her(emoter)] arm</I>"
 			. = ..()
-	juggle
-		use_is_restricted_if = RESTRAINED
+	/*juggle
+		emote_squelched_if = RESTRAINED
 		make_emote(var/mob/emoter, var/target)
 			if (emoter.emote_check(voluntary, 2.5 SECONDS))
 				if (emoter.traitHolder?.hasTrait("training_clown") || emoter.traitHolder?.hasTrait("training_mime") || emoter.can_juggle)
@@ -108,6 +139,18 @@ ABSTRACT_TYPE(/datum/emotedata/basic)
 					else
 						message = "<B>[emoter]</B> wiggles [his_or_her(emoter)] fingers a bit.[prob(10) ? " Weird." : null]"
 						maptext_out = "<I>wiggles [his_or_her(emoter)] fingers a bit.</I>"
+			. = ..()*/
+	juststare
+		phrases = list("jsay")
+		make_emote(var/mob/emoter, var/target)
+			em_chattext = "<b>[emoter]</b> just stares at you."
+			em_maptext = "<I>just stares at you</I>"
+			. = ..()
+	nodslowly
+		phrases = list("nods")
+		make_emote(var/mob/emoter, var/target)
+			em_chattext = "<b>[emoter]</b> nods slowly."
+			em_maptext = "<I>nods slowly</I>"
 			. = ..()
 	pale
 		phrases = list("gopale")
@@ -115,7 +158,6 @@ ABSTRACT_TYPE(/datum/emotedata/basic)
 			em_chattext = "<b>[emoter]</b> goes pale for a second."
 			em_maptext = "<I>goes pale...</I>"
 			. = ..()
-
 	rage
 		phrases = list("fury","angry")
 		make_emote(var/mob/emoter, var/target)
@@ -134,7 +176,17 @@ ABSTRACT_TYPE(/datum/emotedata/basic)
 			em_chattext = "<b>[emoter]</b> shakes [his_or_her(emoter)] head."
 			em_maptext = "<I>shakes [his_or_her(emoter)] head</I>"
 			. = ..()
-
+	shame
+		make_emote(var/mob/emoter, var/target)
+			em_chattext = "<b>[emoter]</b> hangs [his_or_her(emoter)] head in shame."
+			em_maptext = "<I>hangs [his_or_her(emoter)] head in shame</I>"
+			. = ..()
+	starehands
+		phrases = list("stareh")
+		make_emote(var/mob/emoter, var/target)
+			em_chattext = "<b>[emoter]</b> stares at [his_or_her(emoter)] hands."
+			em_maptext = "<I>stares at [his_or_her(emoter)] hands</I>"
+			. = ..()
 	uguu
 		mode = AUDIBLE
 		make_emote(var/mob/emoter, var/target)
@@ -216,8 +268,7 @@ ABSTRACT_TYPE(/datum/emotedata/basic)
 ABSTRACT_TYPE(/datum/emotedata/basic/simple)
 ABSTRACT_TYPE(/datum/emotedata/basic/simple/visible)
 ABSTRACT_TYPE(/datum/emotedata/basic/simple/audible)
-/datum/emotedata/basic/simple // For the discerning emoter. Makes the emoter do the first activation phrase in the list. Splendid.
-		   					  // DISCLAIMER: Might do other shit too. idgaf. This is here so I don't have to rewrite the chattext.
+/datum/emotedata/basic/simple // Uses the name of the emote to auto-write the emote text
 	make_emote(var/mob/emoter, var/target)
 		var/act = phrases[1]
 		em_chattext ||= "<B>[emoter]</B> [act]s."
@@ -227,10 +278,10 @@ ABSTRACT_TYPE(/datum/emotedata/basic/simple/audible)
 	visible //Don't freak out: Code in the Emote() proc adds the name of each emote as an activation phrase.
 		mode = VISIBLE
 		//If you're making/editing an emote, note that emotes that have vars defined in {curly brackets} don't play nicely
-		// with indentations.
+		// with indentations. Leave them as a single line or expand them into indented format.
 		blink
 		bow
-		clap  {use_is_restricted_if = RESTRAINED}
+		clap  {emote_squelched_if = RESTRAINED}
 		drool
 		frown {phrases = list(":(")}
 		gesticulate
@@ -254,9 +305,9 @@ ABSTRACT_TYPE(/datum/emotedata/basic/simple/audible)
 
 	audible //unfinished
 		mode = AUDIBLE
-		use_is_restricted_if = MUZZLED
+		emote_squelched_if = MUZZLED
 		birdwell //unfinished
-			use_is_restricted_if = null
+			emote_squelched_if = null
 			em_opt = OPT_IN
 			make_emote(var/mob/emoter, var/target)
 				. = ..()
@@ -304,12 +355,12 @@ ABSTRACT_TYPE(/datum/emotedata/basic/simple/audible)
 		whine
 		wheeze
 		whimper
-		yawn // due to budget cuts noncontaigousyawn must be written elsewhere
+		yawn // To make noncontaigous, simply add a target. can just be something like foo.emote("yawn",1)
 			make_emote(var/mob/emoter, var/target)
 				. = ..()
 				for (var/mob/living/carbon/C in view(5,get_turf(emoter)))
 					if (prob(5) && !ON_COOLDOWN(C, "contagious_yawn", 5 SECONDS) && target != null)
-						C.emote("yawn", emoter) // just picking something random so that
+						C.emote("yawn", 1) // that "1" makes it non-contagious. smiles
 
 ABSTRACT_TYPE(/datum/emotedata/targeted)
 /*
@@ -396,7 +447,7 @@ ABSTRACT_TYPE(/datum/emotedata/info)
 Basic
 	scream
 		phrases = list("scream")
-		use_restricted_if = MUZZLED
+		emote_squelched_if = MUZZLED
 	monsterscream
 		phrases = list("monsterscream")
 	fart
@@ -405,13 +456,13 @@ Basic
 		phrases = list("lookaround")
 	juggle
 		phrases = list("juggle")
-		use_restricted_if = RESTRAINED
+		emote_squelched_if = RESTRAINED
 	twirl
 		phrases = list("twirl","spin")
-		use_restricted_if = RESTRAINED
+		emote_squelched_if = RESTRAINED
 	tip
 		phrases = list("tip")
-		use_restricted_if = RESTRAINED
+		emote_squelched_if = RESTRAINED
 	uguu
 		phrases = list("uguu")
 	hatstomp
